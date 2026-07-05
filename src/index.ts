@@ -489,6 +489,36 @@ app.delete('/api/jobs/:id', requireAuth, async (req, res) => {
   res.json({ success: true })
 })
 
+// Get all contact messages (admin only)
+app.get('/api/admin/contacts', requireAuth, async (req, res) => {
+  const messages = await prisma.contactMessage.findMany({
+    orderBy: { createdAt: 'desc' }
+  })
+  res.json(messages)
+})
+
+// Delete contact message
+app.delete('/api/admin/contacts/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  await prisma.contactMessage.delete({ where: { id } })
+  res.json({ success: true })
+})
+
+// Get all job applications (admin only)
+app.get('/api/admin/applications', requireAuth, async (req, res) => {
+  const applications = await prisma.jobApplication.findMany({
+    orderBy: { createdAt: 'desc' }
+  })
+  res.json(applications)
+})
+
+// Delete job application
+app.delete('/api/admin/applications/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  await prisma.jobApplication.delete({ where: { id } })
+  res.json({ success: true })
+})
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
