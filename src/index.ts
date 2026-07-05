@@ -408,6 +408,87 @@ app.delete('/api/subsidiaries/:id', requireAuth, async (req, res) => {
   res.json({ success: true })
 })
 
+// Create subsidiary
+app.post('/api/subsidiaries', requireAuth, async (req, res) => {
+  const { id, name, description, image } = req.body
+  const subsidiary = await prisma.subsidiary.create({
+    data: { id, name, description, image },
+  })
+  res.status(201).json(subsidiary)
+})
+
+// Update subsidiary
+app.put('/api/subsidiaries/:id', requireAuth, async (req, res) => {
+  const id = String(req.params['id'])
+  const { name, description, image } = req.body
+  const subsidiary = await prisma.subsidiary.update({
+    where: { id },
+    data: { name, description, image },
+  })
+  res.json(subsidiary)
+})
+
+// Delete subsidiary (already exists, just confirming)
+app.delete('/api/subsidiaries/:id', requireAuth, async (req, res) => {
+  const id = String(req.params['id'])
+  await prisma.subsidiary.delete({ where: { id } })
+  res.json({ success: true })
+})
+
+// Create blog post
+app.post('/api/blogs', requireAuth, async (req, res) => {
+  const { id, title, date, category, excerpt, content, image } = req.body
+  const post = await prisma.blogPost.create({
+    data: { id, title, date, category, excerpt, content, image },
+  })
+  res.status(201).json(post)
+})
+
+// Update blog post
+app.put('/api/blogs/:id', requireAuth, async (req, res) => {
+  const id = String(req.params['id'])
+  const { title, date, category, excerpt, content, image } = req.body
+  const post = await prisma.blogPost.update({
+    where: { id },
+    data: { title, date, category, excerpt, content, image },
+  })
+  res.json(post)
+})
+
+// Delete blog post
+app.delete('/api/blogs/:id', requireAuth, async (req, res) => {
+  const id = String(req.params['id'])
+  await prisma.blogPost.delete({ where: { id } })
+  res.json({ success: true })
+})
+
+// Create job opening
+app.post('/api/jobs', requireAuth, async (req, res) => {
+  const { id, title, department, location, type, description, deadline } = req.body
+  const job = await prisma.jobOpening.create({
+    data: { id, title, department, location, type, description, deadline },
+  })
+  res.status(201).json(job)
+})
+
+// Update job opening
+app.put('/api/jobs/:id', requireAuth, async (req, res) => {
+  const id = String(req.params['id'])
+  const { title, department, location, type, description, deadline } = req.body
+  const job = await prisma.jobOpening.update({
+    where: { id },
+    data: { title, department, location, type, description, deadline },
+  })
+  res.json(job)
+})
+
+// Delete job opening
+app.delete('/api/jobs/:id', requireAuth, async (req, res) => {
+  const id = String(req.params['id'])
+  await prisma.jobOpening.delete({ where: { id } })
+  res.json({ success: true })
+})
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
