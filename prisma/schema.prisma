@@ -77,3 +77,15 @@ model User {
   role      String   @default("admin")
   createdAt DateTime @default(now())
 }
+model AboutContent {
+  id         Int    @id @default(autoincrement())
+  background String
+  vision     String
+  mission    String
+}
+
+model CoreValue {
+  id    Int    @id @default(autoincrement())
+  title String
+  text  String
+}

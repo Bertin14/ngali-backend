@@ -519,6 +519,77 @@ app.delete('/api/admin/applications/:id', requireAuth, async (req, res) => {
   res.json({ success: true })
 })
 
+// --- About content ---
+app.get('/api/about', async (req, res) => {
+  const content = await prisma.aboutContent.findFirst()
+  res.json(content)
+})
+
+app.put('/api/about', requireAuth, async (req, res) => {
+  const { background, vision, mission } = req.body
+  const content = await prisma.aboutContent.upsert({
+    where: { id: 1 },
+    update: { background, vision, mission },
+    create: { background, vision, mission },
+  })
+  res.json(content)
+})
+
+// --- Core values ---
+app.get('/api/values', async (req, res) => {
+  const values = await prisma.coreValue.findMany()
+  res.json(values)
+})
+
+app.post('/api/values', requireAuth, async (req, res) => {
+  const { title, text } = req.body
+  const value = await prisma.coreValue.create({
+    data: { title, text },
+  })
+  res.status(201).json(value)
+})
+
+app.put('/api/values/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  const { title, text } = req.body
+  const value = await prisma.coreValue.update({
+    where: { id },
+    data: { title, text },
+  })
+  res.json(value)
+})
+
+app.delete('/api/values/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  await prisma.coreValue.delete({ where: { id } })
+  res.json({ success: true })
+})
+
+// --- Team members ---
+app.post('/api/team', requireAuth, async (req, res) => {
+  const { name, role } = req.body
+  const member = await prisma.teamMember.create({
+    data: { name, role },
+  })
+  res.status(201).json(member)
+})
+
+app.put('/api/team/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  const { name, role } = req.body
+  const member = await prisma.teamMember.update({
+    where: { id },
+    data: { name, role },
+  })
+  res.json(member)
+})
+
+app.delete('/api/team/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  await prisma.teamMember.delete({ where: { id } })
+  res.json({ success: true })
+})
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })

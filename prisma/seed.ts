@@ -173,6 +173,26 @@ await prisma.user.upsert({
   },
 })
 console.log('Admin user seeded successfully')
+
+await prisma.aboutContent.upsert({
+  where: { id: 1 },
+  update: {},
+  create: {
+    background: "In 2000, the Government of Rwanda developed Vision 2020, aiming to transform Rwanda into a middle-income country. To help realize this goal, a development company called Digitech Solutions was registered in 2010 to execute projects in the energy, IT, and healthcare sectors. In 2012, Digitech Solutions was rebranded and restructured into the investment holding company Ngali Holdings.",
+    vision: "Contribute to the solution of enhancing economic growth in Africa",
+    mission: "With a special focus on Rwanda, invest in businesses that unlock economic potential and eliminate growth barriers in Africa",
+  },
+})
+console.log('About content seeded successfully')
+
+await prisma.coreValue.createMany({
+  data: [
+    { title: "Cohesion", text: "Commitment to a stronger, integrated, valuable, efficient economy." },
+    { title: "Diversity", text: "Team diversity provides valuable insight and understanding of the challenges faced by citizens and the industry." },
+    { title: "Talent", text: "Focus on development of people and knowledge to drive business growth." },
+  ],
+})
+console.log('Core values seeded successfully')
 }
 
 main()
