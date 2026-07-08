@@ -10,6 +10,7 @@ import swaggerJsdoc from 'swagger-jsdoc'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { requireAuth } from './middleware/auth.js'
+import { upload, uploadToCloudinary } from './upload.js'
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })
@@ -566,20 +567,22 @@ app.delete('/api/values/:id', requireAuth, async (req, res) => {
 })
 
 // --- Team members ---
+// Create team member
 app.post('/api/team', requireAuth, async (req, res) => {
-  const { name, role } = req.body
+  const { name, role, image } = req.body
   const member = await prisma.teamMember.create({
-    data: { name, role },
+    data: { name, role, image },
   })
   res.status(201).json(member)
 })
 
+// Update team member
 app.put('/api/team/:id', requireAuth, async (req, res) => {
   const id = parseInt(String(req.params['id']))
-  const { name, role } = req.body
+  const { name, role, image } = req.body
   const member = await prisma.teamMember.update({
     where: { id },
-    data: { name, role },
+    data: { name, role, image },
   })
   res.json(member)
 })
@@ -588,6 +591,44 @@ app.delete('/api/team/:id', requireAuth, async (req, res) => {
   const id = parseInt(String(req.params['id']))
   await prisma.teamMember.delete({ where: { id } })
   res.json({ success: true })
+})
+
+/**
+ * @swagger
+ * /api/upload:
+ *   post:
+ *     summary: Upload an image to Cloudinary
+ *     tags: [Upload]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *               folder:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Returns the uploaded image URL
+ */
+app.post('/api/upload', requireAuth, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' })
+    }
+
+    const folder = (req.body.folder as string) || 'general'
+    const url = await uploadToCloudinary(req.file.buffer, folder)
+    res.json({ url })
+  } catch (error) {
+    console.error('Upload error:', error)
+    res.status(500).json({ error: String(error) })
+  }
 })
 
 app.listen(PORT, () => {
