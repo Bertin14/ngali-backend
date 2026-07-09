@@ -593,44 +593,6 @@ app.delete('/api/team/:id', requireAuth, async (req, res) => {
   res.json({ success: true })
 })
 
-/**
- * @swagger
- * /api/upload:
- *   post:
- *     summary: Upload an image to Cloudinary
- *     tags: [Upload]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               image:
- *                 type: string
- *                 format: binary
- *               folder:
- *                 type: string
- *     responses:
- *       200:
- *         description: Returns the uploaded image URL
- */
-app.post('/api/upload', requireAuth, upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' })
-    }
-
-    const folder = (req.body.folder as string) || 'general'
-    const url = await uploadToCloudinary(req.file.buffer, folder)
-    res.json({ url })
-  } catch (error) {
-    console.error('Upload error:', error)
-    res.status(500).json({ error: String(error) })
-  }
-})
-
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
