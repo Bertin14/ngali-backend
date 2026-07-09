@@ -235,7 +235,9 @@ app.get('/api/sectors', async (req, res) => {
  *         description: List of all team members
  */
 app.get('/api/team', async (req, res) => {
-  const team = await prisma.teamMember.findMany()
+  const team = await prisma.teamMember.findMany({
+    orderBy: { order: 'asc' }
+  })
   res.json(team)
 })
 
@@ -567,22 +569,20 @@ app.delete('/api/values/:id', requireAuth, async (req, res) => {
 })
 
 // --- Team members ---
-// Create team member
 app.post('/api/team', requireAuth, async (req, res) => {
-  const { name, role, image } = req.body
+  const { name, role, image, order } = req.body
   const member = await prisma.teamMember.create({
-    data: { name, role, image },
+    data: { name, role, image, order: order ?? 0 },
   })
   res.status(201).json(member)
 })
 
-// Update team member
 app.put('/api/team/:id', requireAuth, async (req, res) => {
   const id = parseInt(String(req.params['id']))
-  const { name, role, image } = req.body
+  const { name, role, image, order } = req.body
   const member = await prisma.teamMember.update({
     where: { id },
-    data: { name, role, image },
+    data: { name, role, image, order: order ?? 0 },
   })
   res.json(member)
 })

@@ -68,6 +68,7 @@ model TeamMember {
   name      String
   role      String
   image     String?
+  order     Int      @default(0)
   createdAt DateTime @default(now())
 }
 model User {
