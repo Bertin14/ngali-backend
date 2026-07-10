@@ -593,6 +593,38 @@ app.delete('/api/team/:id', requireAuth, async (req, res) => {
   res.json({ success: true })
 })
 
+// --- Board Members ---
+app.get('/api/board', async (req, res) => {
+  const board = await prisma.boardMember.findMany({
+    orderBy: { order: 'asc' }
+  })
+  res.json(board)
+})
+
+app.post('/api/board', requireAuth, async (req, res) => {
+  const { name, role, image, order } = req.body
+  const member = await prisma.boardMember.create({
+    data: { name, role, image, order: order ?? 0 },
+  })
+  res.status(201).json(member)
+})
+
+app.put('/api/board/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  const { name, role, image, order } = req.body
+  const member = await prisma.boardMember.update({
+    where: { id },
+    data: { name, role, image, order: order ?? 0 },
+  })
+  res.json(member)
+})
+
+app.delete('/api/board/:id', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  await prisma.boardMember.delete({ where: { id } })
+  res.json({ success: true })
+})
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
