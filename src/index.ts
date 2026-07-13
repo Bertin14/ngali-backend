@@ -579,11 +579,19 @@ app.post('/api/team', requireAuth, async (req, res) => {
 
 app.put('/api/team/:id', requireAuth, async (req, res) => {
   const id = parseInt(String(req.params['id']))
-  const { name, role, image, order } = req.body
+  const { name, role, image, order, bio, cv } = req.body
   const member = await prisma.teamMember.update({
     where: { id },
-    data: { name, role, image, order: order ?? 0 },
+    data: { name, role, image, order: order ?? 0, bio, cv },
   })
+  res.json(member)
+})
+
+// Get single team member
+app.get('/api/team/:id', async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  const member = await prisma.teamMember.findUnique({ where: { id } })
+  if (!member) return res.status(404).json({ error: 'Member not found' })
   res.json(member)
 })
 
@@ -611,11 +619,19 @@ app.post('/api/board', requireAuth, async (req, res) => {
 
 app.put('/api/board/:id', requireAuth, async (req, res) => {
   const id = parseInt(String(req.params['id']))
-  const { name, role, image, order } = req.body
+  const { name, role, image, order, bio, cv } = req.body
   const member = await prisma.boardMember.update({
     where: { id },
-    data: { name, role, image, order: order ?? 0 },
+    data: { name, role, image, order: order ?? 0, bio, cv },
   })
+  res.json(member)
+})
+
+// Get single board member
+app.get('/api/board/:id', async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  const member = await prisma.boardMember.findUnique({ where: { id } })
+  if (!member) return res.status(404).json({ error: 'Member not found' })
   res.json(member)
 })
 

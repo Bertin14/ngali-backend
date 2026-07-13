@@ -63,12 +63,15 @@ model Sector {
   image     String
   createdAt DateTime @default(now())
 }
+
 model TeamMember {
   id        Int      @id @default(autoincrement())
   name      String
   role      String
   image     String?
   order     Int      @default(0)
+  bio       String?
+  cv        String?
   createdAt DateTime @default(now())
 }
 model User {
@@ -97,5 +100,7 @@ model BoardMember {
   role      String
   image     String?
   order     Int      @default(0)
+  bio       String?
+  cv        String?
   createdAt DateTime @default(now())
 }
