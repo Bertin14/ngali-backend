@@ -1,17 +1,12 @@
 import nodemailer from 'nodemailer'
 
-const transportOptions = {
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // true for port 465
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
-  family: 4, // force IPv4 — avoids ENETUNREACH on hosts without outbound IPv6
-}
-
-const transporter = nodemailer.createTransport(transportOptions as Parameters<typeof nodemailer.createTransport>[0])
+})
 
 export async function sendContactNotification(name: string, email: string, message: string) {
   await transporter.sendMail({
