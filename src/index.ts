@@ -11,6 +11,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { requireAuth } from './middleware/auth.js'
 import { upload, uploadToCloudinary } from './upload.js'
+import { sendContactNotification, sendApplicationNotification, sendReply } from './email.js'
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })
@@ -271,9 +272,17 @@ app.post('/api/contact', async (req, res) => {
   const submission = await prisma.contactMessage.create({
     data: { name, email, message },
   })
+
+  // Send email notification to admin
+  try {
+    await sendContactNotification(name, email, message)
+  } catch (error) {
+    console.error('Failed to send contact notification:', error)
+    // Don't fail the request if email fails
+  }
+
   res.status(201).json(submission)
 })
-
 // --- Job applications ---
 /**
  * @swagger
@@ -306,7 +315,47 @@ app.post('/api/applications', async (req, res) => {
   const application = await prisma.jobApplication.create({
     data: { jobId, name, email, coverLetter },
   })
+
+  // Send email notification to admin
+  try {
+    await sendApplicationNotification(name, email, jobId, coverLetter)
+  } catch (error) {
+    console.error('Failed to send application notification:', error)
+  }
+
   res.status(201).json(application)
+})
+
+app.post('/api/admin/contacts/:id/reply', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  const { replyMessage } = req.body
+
+  const message = await prisma.contactMessage.findUnique({ where: { id } })
+  if (!message) return res.status(404).json({ error: 'Message not found' })
+
+  try {
+    await sendReply(message.email, message.name, replyMessage, message.message)
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Failed to send reply:', error)
+    res.status(500).json({ error: 'Failed to send reply' })
+  }
+})
+
+app.post('/api/admin/applications/:id/reply', requireAuth, async (req, res) => {
+  const id = parseInt(String(req.params['id']))
+  const { replyMessage } = req.body
+
+  const application = await prisma.jobApplication.findUnique({ where: { id } })
+  if (!application) return res.status(404).json({ error: 'Application not found' })
+
+  try {
+    await sendReply(application.email, application.name, replyMessage, application.coverLetter)
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Failed to send reply:', error)
+    res.status(500).json({ error: 'Failed to send reply' })
+  }
 })
 
 /**
