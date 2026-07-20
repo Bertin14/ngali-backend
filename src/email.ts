@@ -1,19 +1,14 @@
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-})
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? ''
+const FROM_EMAIL = 'onboarding@resend.dev'
 
 export async function sendContactNotification(name: string, email: string, message: string) {
-  await transporter.sendMail({
-    from: `"Ngali Holdings Website" <${process.env.GMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL,
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: ADMIN_EMAIL,
     subject: `New Contact Message from ${name}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -29,10 +24,7 @@ export async function sendContactNotification(name: string, email: string, messa
             ${message}
           </div>
           <p style="margin-top: 20px; color: #666; font-size: 14px;">
-            Reply to this message from your 
-            <a href="https://ngaliholdings.vercel.app/admin/contacts" style="color: #C9824B;">
-              admin dashboard
-            </a>
+            Reply from your <a href="https://ngaliholdings.vercel.app/admin/contacts" style="color: #C9824B;">admin dashboard</a>
           </p>
         </div>
       </div>
@@ -46,9 +38,9 @@ export async function sendApplicationNotification(
   jobId: string,
   coverLetter: string
 ) {
-  await transporter.sendMail({
-    from: `"Ngali Holdings Website" <${process.env.GMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL,
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: ADMIN_EMAIL,
     subject: `New Job Application — ${jobId}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -65,10 +57,7 @@ export async function sendApplicationNotification(
             ${coverLetter}
           </div>
           <p style="margin-top: 20px; color: #666; font-size: 14px;">
-            Review this application from your 
-            <a href="https://ngaliholdings.vercel.app/admin/applications" style="color: #C9824B;">
-              admin dashboard
-            </a>
+            Review from your <a href="https://ngaliholdings.vercel.app/admin/applications" style="color: #C9824B;">admin dashboard</a>
           </p>
         </div>
       </div>
@@ -77,9 +66,9 @@ export async function sendApplicationNotification(
 }
 
 export async function sendReply(to: string, name: string, replyMessage: string, originalMessage: string) {
-  await transporter.sendMail({
-    from: `"Ngali Holdings" <${process.env.GMAIL_USER}>`,
-    to: `${name} <${to}>`,
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: to,
     subject: `Re: Your message to Ngali Holdings`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
