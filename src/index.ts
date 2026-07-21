@@ -283,7 +283,6 @@ app.post('/api/contact', async (req, res) => {
 
   res.status(201).json(submission)
 })
-// --- Job applications ---
 /**
  * @swagger
  * /api/applications:
@@ -296,13 +295,17 @@ app.post('/api/contact', async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required: [jobId, name, email, coverLetter]
+ *             required: [jobId, firstName, lastName, email, phone, dateOfBirth, gender, nationality, citizenship, coverLetter]
  *             properties:
  *               jobId:
  *                 type: string
- *               name:
+ *               firstName:
+ *                 type: string
+ *               lastName:
  *                 type: string
  *               email:
+ *                 type: string
+ *               phone:
  *                 type: string
  *               coverLetter:
  *                 type: string
@@ -310,15 +313,25 @@ app.post('/api/contact', async (req, res) => {
  *       201:
  *         description: Application saved successfully
  */
-app.post('/api/applications', async (req, res) => {
-  const { jobId, name, email, coverLetter } = req.body
+ app.post('/api/applications', async (req, res) => {
+  const {
+    jobId, firstName, lastName, email, phone,
+    dateOfBirth, gender, nationality, citizenship,
+    coverLetter, cvUrl, coverLetterUrl, degreeUrl, certificatesUrl
+  } = req.body
+
   const application = await prisma.jobApplication.create({
-    data: { jobId, name, email, coverLetter },
+    data: {
+      jobId, firstName, lastName, email, phone,
+      dateOfBirth, gender, nationality, citizenship,
+      coverLetter, cvUrl, coverLetterUrl, degreeUrl, certificatesUrl
+    },
   })
 
-  // Send email notification to admin
   try {
-    await sendApplicationNotification(name, email, jobId, coverLetter)
+    await sendApplicationNotification(
+      `${firstName} ${lastName}`, email, jobId, coverLetter
+    )
   } catch (error) {
     console.error('Failed to send application notification:', error)
   }
@@ -350,7 +363,7 @@ app.post('/api/admin/applications/:id/reply', requireAuth, async (req, res) => {
   if (!application) return res.status(404).json({ error: 'Application not found' })
 
   try {
-    await sendReply(application.email, application.name, replyMessage, application.coverLetter)
+    await sendReply(application.email, '${application.firstName} ${application.lastName}', replyMessage, application.coverLetter ?? '')
     res.json({ success: true })
   } catch (error) {
     console.error('Failed to send reply:', error)

@@ -49,12 +49,22 @@ model ContactMessage {
 }
 
 model JobApplication {
-  id           Int      @id @default(autoincrement())
-  jobId        String
-  name         String
-  email        String
-  coverLetter  String
-  createdAt    DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  jobId            String
+  firstName        String?
+  lastName         String?
+  email            String
+  phone            String?
+  dateOfBirth      String?
+  gender           String?
+  nationality      String?
+  citizenship      String?
+  coverLetter      String
+  cvUrl            String?
+  coverLetterUrl   String?
+  degreeUrl        String?
+  certificatesUrl  String?
+  createdAt        DateTime @default(now())
 }
 model Sector {
   id        String   @id
