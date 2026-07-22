@@ -329,12 +329,12 @@ app.post('/api/contact', async (req, res) => {
   })
 
   try {
-    await sendApplicationNotification(
-      `${firstName} ${lastName}`, email, jobId, coverLetter
-    )
-  } catch (error) {
-    console.error('Failed to send application notification:', error)
-  }
+  await sendApplicationNotification(
+    `${firstName} ${lastName}`, email, jobId, coverLetterUrl ?? 'See uploaded document'
+  )
+} catch (error) {
+  console.error('Failed to send application notification:', error)
+}
 
   res.status(201).json(application)
 })

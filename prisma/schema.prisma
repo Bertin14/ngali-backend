@@ -59,7 +59,7 @@ model JobApplication {
   gender           String?
   nationality      String?
   citizenship      String?
-  coverLetter      String
+  coverLetter      String?
   cvUrl            String?
   coverLetterUrl   String?
   degreeUrl        String?
